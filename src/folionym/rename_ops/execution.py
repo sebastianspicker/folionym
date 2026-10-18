@@ -27,8 +27,14 @@ logger = logging.getLogger("folionym.rename_ops")
 
 
 def apply_single_rename(file_path: Path, base: str, options: RenameApplyOptions) -> tuple[bool, Path]:
-    """Apply one rename with atomic collision retries, backup, plan, and dry-run support."""
+    """Apply one rename with atomic collision retries, backup, plan, and dry-run support.
+
+    A source that already holds the name its base would resolve to is left alone and
+    returned as its own target, without a backup, plan entry or post-rename callback.
+    """
     state, retry_context = _initialize_rename_attempt(file_path, base)
+    if _source_already_named(retry_context, state, options):
+        return True, file_path
     source_fd: int | None = None
     try:
         if not options.dry_run and not options.plan_file_path:
@@ -58,6 +64,26 @@ def _initialize_rename_attempt(file_path: Path, base: str) -> tuple[RenameAttemp
     state = RenameAttemptState(base, file_path.with_name(base + suffix), 0)
     validate_path_within_parent(state.target, file_path.parent)
     return state, RenameRetryContext(file_path, base, suffix)
+
+
+def _source_already_named(
+    retry_context: RenameRetryContext, state: RenameAttemptState, options: RenameApplyOptions
+) -> bool:
+    """Return whether the source is the first candidate that is not occupied by another file."""
+    for _attempt in range(MAX_RENAME_RETRIES):
+        if state.target == retry_context.file_path:
+            return True
+        if options.exact_target or not os.path.lexists(state.target):
+            return False
+        current_base, target = _collision_target(
+            retry_context.file_path,
+            retry_context.base,
+            retry_context.suffix,
+            state.counter + 1,
+            options.max_filename_chars,
+        )
+        state = RenameAttemptState(current_base, target, state.counter + 1)
+    return False
 
 
 def _run_rename_attempts(
@@ -93,6 +119,10 @@ def _apply_rename_attempt(
     source_fd: int | None,
 ) -> tuple[bool, Path]:
     """Record, simulate, or perform one no-overwrite rename candidate."""
+    # A lower candidate was taken after the up-front check; the backup written for this
+    # attempt stays behind, but the source keeps its name.
+    if state.target == file_path:
+        return True, file_path
     if (options.dry_run or options.plan_file_path) and os.path.lexists(state.target):
         raise FileExistsError(f"Target already exists: {state.target}")
     if _record_rename_plan(file_path, state.target, options):

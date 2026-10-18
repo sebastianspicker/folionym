@@ -149,12 +149,18 @@ def _write_plan_file(config: RenamerConfig, output: RenameOutputData) -> None:
         logger.info("Wrote rename plan (%s entries) to %s", len(output.plan_entries), plan_path)
 
 
-def _log_summary(output: RenameOutputData) -> None:
+def is_simulated_run(config: RenamerConfig) -> bool:
+    """Return whether a run only proposes renames: a dry run or a plan-file export."""
+    return bool(config.output.mode.dry_run or config.output.paths.plan_file_path)
+
+
+def _log_summary(output: RenameOutputData, *, simulated: bool) -> None:
     """Log the final rename-run counters."""
     logger.info(
-        "Summary: %s file(s) processed, %s renamed, %s skipped, %s failed",
+        "Summary: %s file(s) processed, %s %s, %s skipped, %s failed",
         output.processed_count,
         output.renamed_count,
+        "would rename" if simulated else "renamed",
         output.skipped_count,
         output.failed_count,
     )
@@ -172,8 +178,8 @@ def write_rename_outputs(config: RenamerConfig, directory: Path, output: RenameO
             renamed=output.renamed_count,
             skipped=output.skipped_count,
             failed=output.failed_count,
-            dry_run=config.output.mode.dry_run,
+            dry_run=is_simulated_run(config),
             failures=output.failure_details,
         ),
     )
-    _log_summary(output)
+    _log_summary(output, simulated=is_simulated_run(config))

@@ -49,7 +49,7 @@ def _add_llm_heuristic_mode_args(p: argparse._ActionsContainer) -> None:
         "--no-timestamp-fallback",
         dest="use_timestamp_fallback",
         action="store_false",
-        help="Do not use date+segment+time filename when category/summary/keywords are all empty.",
+        help="Do not use date+segment filename when category/summary/keywords are all empty.",
     )
     p.add_argument(
         "--timestamp-fallback-segment",

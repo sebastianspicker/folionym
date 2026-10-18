@@ -34,6 +34,12 @@ LLM error logs omit endpoint URLs, request exception details, response bodies,
 and document-derived payloads. Some OpenAI-compatible servers echo request
 content in error responses, so response bodies must not be written to logs.
 
+With the optional `tokens` extra installed, tiktoken downloads its encoding file
+from `openaipublic.blob.core.windows.net` on first use and caches it (by default
+under the system temporary directory; set `TIKTOKEN_CACHE_DIR` to choose the
+location). That request carries no document content. When it fails, Folionym
+logs a warning once per encoding and estimates token counts from text length.
+
 This release does not support local model-loading or embedding backends. Keep
 document-derived model request content within an endpoint and network boundary
 you explicitly trust.

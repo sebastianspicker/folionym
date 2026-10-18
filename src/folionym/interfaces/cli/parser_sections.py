@@ -147,16 +147,25 @@ def add_template_and_plan_args(p: argparse._ActionsContainer) -> None:
 
 def add_language_case_project_args(p: argparse._ActionsContainer) -> None:
     """Register language case project command-line flags on the shared parser."""
-    p.add_argument("--language", default=None, choices=["de", "en"], help="LLM prompt language (default: de).")
+    p.add_argument(
+        "--language",
+        default=None,
+        choices=["de", "en"],
+        help="Document language for LLM prompts and OCR (deu/eng) (default: de; asked in a terminal when omitted).",
+    )
     p.add_argument(
         "--case",
         dest="desired_case",
         default=None,
         choices=sorted(DESIRED_CASE_CHOICES),
-        help="Filename case style (default: kebabCase).",
+        help="Filename case style (default: kebabCase; asked in a terminal when omitted).",
     )
-    p.add_argument("--project", default=None, help="Project prefix in generated filenames.")
-    p.add_argument("--version", default=None, help="Version suffix in generated filenames.")
+    p.add_argument(
+        "--project", default=None, help="Project prefix in generated filenames (asked in a terminal when omitted)."
+    )
+    p.add_argument(
+        "--version", default=None, help="Version suffix in generated filenames (asked in a terminal when omitted)."
+    )
 
 
 def add_output_and_ux_args(p: argparse._ActionsContainer) -> None:

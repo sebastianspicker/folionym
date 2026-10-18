@@ -33,7 +33,7 @@ It can also build names from a template using date, project, category,
 keywords, summary, version, invoice ID, amount, and company fields.
 
 - PDF text and metadata extraction with PyMuPDF
-- Heuristic classification using bundled category data
+- Heuristic classification of English and German documents using bundled category data
 - Optional OCR through OCRmyPDF and optional vision through a compatible model
 - OpenAI-compatible HTTP endpoints for summaries, keywords, categories, and vision
 - Directory, recursive, single-file, watch, dry-run, and interactive workflows
@@ -42,7 +42,10 @@ keywords, summary, version, invoice ID, amount, and company fields.
 
 Everything runs as one local process under your own user account. The LLM
 endpoint and the optional post-rename hook are the only places document-derived
-content can leave the machine.
+content can leave the machine. With the `tokens` extra, tiktoken also downloads
+its encoding file (no document content) from `openaipublic.blob.core.windows.net`
+once and caches it; offline, Folionym estimates token counts from text length
+instead.
 
 ## A quick tour
 
@@ -94,7 +97,7 @@ python -m pip install -e '.[pdf,tokens,ocr,tui,web]'
 | Extra | Adds |
 | --- | --- |
 | `pdf` | PyMuPDF text, metadata, image, and thumbnail support |
-| `tokens` | token-aware content limits through tiktoken |
+| `tokens` | token-aware content limits through tiktoken (one-time encoding download, see above) |
 | `ocr` | OCRmyPDF integration |
 | `tui` | Textual terminal interface |
 | `web` | FastAPI, Uvicorn, PyMuPDF, and the browser interface |
@@ -118,6 +121,21 @@ Preview a directory without sending content to an LLM:
 ```bash
 folionym --dir ./input_files --no-llm --dry-run
 ```
+
+The document language defaults to German (`de`). It selects German LLM
+prompts and the Tesseract `deu` language for OCR, so OCR of scans needs
+Tesseract's German language data. For English documents pass `--language en`
+(OCR then uses `eng`), or set `language: en` in a `--config` file;
+`FOLIONYM_OCR_LANG` overrides only the OCR language. The heuristic categories
+recognise English and German documents under either setting.
+
+When `folionym` runs in a terminal, it asks for the language, filename case,
+project and version before it starts if you did not pass `--language`,
+`--case`, `--project` or `--version` and your `--config` file does not set
+them; press Enter to accept the default shown. Without a directory or file
+option it also asks for a directory. Pass those options, or run it from a
+script or with input redirected (`< /dev/null`), to skip the questions; the
+defaults are then used, and a missing directory is an error.
 
 Preview a recursive selection:
 
@@ -156,7 +174,9 @@ Folionym has two deliberate apply policies:
 
 - **Unique-available.** Conventional CLI runs and immediate TUI single-file
   renames use a target that is free at the moment of the move. A collision can
-  receive a numeric suffix.
+  receive a numeric suffix. A file that already has its proposed name (including
+  a suffix it received earlier) is left alone, so running the same command again
+  changes nothing.
 - **Exact reviewed.** Browser and directory-TUI plans apply the exact target you
   reviewed. Apply rechecks source identity, selected duplicates, and target
   availability at the filesystem mutation boundary, then fails on a conflict

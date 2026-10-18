@@ -28,6 +28,7 @@ from .artifacts import (
     RenameOutputData,
     RenameSummaryData,
     append_export_row,
+    is_simulated_run,
     write_rename_outputs,
     write_summary_json,
 )
@@ -61,12 +62,13 @@ class RenameHooks:
 
 @dataclass(frozen=True)
 class RenameRunSummary:
-    """Counters for one completed rename run."""
+    """Counters for one completed rename run; a simulated run (dry run, plan export) changed nothing."""
 
     processed: int
     renamed: int
     skipped: int
     failed: int
+    simulated: bool = False
 
 
 @dataclass(frozen=True)
@@ -150,14 +152,18 @@ def _apply_rename_result(
             }
         )
         return
+    if target == file_path:
+        logger.info("Already named: '%s'", file_path.name)
+        state.skipped_count += 1
+        return
     if config.output.mode.dry_run:
         if config.output.paths.export_metadata_path and len(state.export_rows) == rows_before:
             append_export_row(state.export_rows, file_path=file_path, target=target, meta=meta)
         logger.info("Dry-run: would rename '%s' to '%s'", file_path.name, target.name)
     else:
-        logger.info("Renamed '%s' to '%s'", file_path.name, target.name)
-        if target != file_path:
-            state.renamed_targets.add(target.resolve())
+        if not config.output.paths.plan_file_path:  # a plan-file run only exports; rename_ops logged it
+            logger.info("Renamed '%s' to '%s'", file_path.name, target.name)
+        state.renamed_targets.add(target.resolve())
     state.renamed_count += 1
 
 
@@ -239,6 +245,7 @@ def rename_pdfs_in_directory(
             renamed=state.renamed_count,
             skipped=state.skipped_count,
             failed=state.failed_count,
+            simulated=is_simulated_run(config),
         ),
     )
 
@@ -268,7 +275,7 @@ def _handle_empty_rename_run(path: Path, config: RenamerConfig) -> None:
             renamed=0,
             skipped=0,
             failed=0,
-            dry_run=bool(config.output.mode.dry_run),
+            dry_run=is_simulated_run(config),
             failures=[],
         ),
     )

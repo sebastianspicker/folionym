@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, replace
-from datetime import datetime
 
 from ..infrastructure.filenames import sanitize_filename_base
 from ..settings import RenamerConfig
@@ -50,24 +49,20 @@ def _should_use_timestamp_fallback(
     return bool(empty_cat and no_tokens)
 
 
-def _build_timestamp_fallback_filename(
-    date_str: str,
-    config: RenamerConfig,
-    *,
-    now: datetime | None = None,
-) -> str:
-    """Build minimal filename: date + segment + HHMMSS when heuristic+LLM both fail."""
-    if now is None:
-        now = datetime.now()
-    time_str = f"{now.hour:02d}{now.minute:02d}{now.second:02d}"
+def _build_timestamp_fallback_filename(date_str: str, config: RenamerConfig) -> str:
+    """Build minimal filename: date + segment when heuristic+LLM both fail.
+
+    The name carries no time of day, so dry run, apply and later runs agree; files that
+    share a date receive the usual collision suffix.
+    """
     segment = (config.output.template.timestamp_fallback_segment or "document").strip() or "document"
     sep = _filename_sep(config)
-    filename = sep.join([date_str, segment, time_str])
+    filename = sep.join([date_str, segment])
     filename = _apply_configured_template(
         filename,
         date_str,
         segment,
-        [segment, time_str],
+        [segment],
         config,
     )
     return _truncate_filename_to_max_chars(filename, config)

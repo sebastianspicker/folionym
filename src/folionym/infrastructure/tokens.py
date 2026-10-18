@@ -2,13 +2,18 @@
 
 ``tiktoken`` is imported lazily and never required: when it is missing or an
 encoding cannot be loaded, callers receive ``None`` and token counting falls
-back to a four-characters-per-token heuristic.
+back to a four-characters-per-token heuristic. On first use tiktoken downloads
+its encoding file and caches it; offline, that download fails once per process
+and the heuristic is used.
 """
 
 from __future__ import annotations
 
+import logging
 import threading
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_ENCODING_NAME = "cl100k_base"
 
@@ -25,6 +30,9 @@ def _load_encoding(name: str) -> Any:
 
         return tiktoken.get_encoding(name)
     except ImportError, KeyError, RuntimeError, ValueError, LookupError:
+        return _MISSING
+    except OSError as exc:  # the first-use download failed (offline, proxy); requests errors are OSError
+        logger.warning("Could not load tiktoken encoding %s (%s); estimating tokens from text length.", name, exc)
         return _MISSING
 
 

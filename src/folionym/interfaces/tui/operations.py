@@ -53,6 +53,13 @@ def process_single_file(fp: Path, config: RenamerConfig) -> SingleFileOperationR
             "Could not rename file",
             "failed",
         )
+    if target == fp:
+        return SingleFileOperationResult(
+            (f"{_SKIP} [dim]Already named[/dim] [bold]{escape_markup(fp.name)}[/bold]\n",),
+            True,
+            "Already named",
+            "skipped",
+        )
     rename_line = (
         f"[{SUCCESS_COLOR}]Renamed[/{SUCCESS_COLOR}] [dim]{escape_markup(fp.name)}[/dim]"
         f" [{SUCCESS_COLOR} bold]->[/{SUCCESS_COLOR} bold] [bold]{escape_markup(target.name)}[/bold]\n"

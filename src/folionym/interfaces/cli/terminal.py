@@ -143,10 +143,8 @@ def print_run_summary(summary: RenameRunSummary) -> None:
     con = Console(stderr=True)
     con.print()
     parts = [f"[bold]{summary.processed}[/bold] processed"]
-    if summary.renamed:
-        parts.append(f"[green]{summary.renamed} renamed[/green]")
-    else:
-        parts.append(f"{summary.renamed} renamed")
+    renamed = f"{summary.renamed} {'would rename' if summary.simulated else 'renamed'}"
+    parts.append(f"[green]{renamed}[/green]" if summary.renamed else renamed)
     if summary.skipped:
         parts.append(f"[yellow]{summary.skipped} skipped[/yellow]")
     else:

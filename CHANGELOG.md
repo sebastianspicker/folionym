@@ -28,6 +28,18 @@ candidate commit is tagged and published as a GitHub prerelease.
 
 ### Changed
 
+- Heuristic-only naming recognises more English and German documents under
+  either `--language` setting: English lease and tenancy agreements,
+  employment, loan and purchase agreements, statements of account, notices of
+  assessment, utility bills, notices to vacate, reference letters, move-in
+  inspection reports, house rules, packing lists, discharge summaries and
+  "certificate of birth/marriage/death" titles, and German compounds such as
+  Einkommensteuererklärung, Einkommensteuerbescheid, Versicherungsschein,
+  Darlehensvertrag, Betriebskostenabrechnung, Übergabeprotokoll, Befundbericht,
+  Kassenbon and "Kündigung des Mietverhältnisses". Payment reminders that cite
+  the invoice they chase are no longer named as invoices, utility statements
+  are no longer named as payslips, and move-in inspection reports are no
+  longer named as vehicle inspections.
 - Re-themed the browser interface and Pages site as "Highlighter": ink on a
   cool off-white, Geist and Geist Mono instead of Newsreader and Atkinson
   Hyperlegible, and one chartreuse marker used only for model output and what
@@ -98,6 +110,31 @@ candidate commit is tagged and published as a GitHub prerelease.
 
 ### Fixed
 
+- The README quick start and `folionym --help` now state that the document
+  language defaults to German (`de`) and that it also selects the OCR language.
+- The README quick start and `folionym --help` now say that, in a terminal,
+  `folionym` asks for the language, case, project and version when those
+  options are omitted, and how to skip the questions.
+- Re-running a conventional CLI apply, a TUI single-file rename, or watch mode
+  (including after a restart) on files that already carry their proposed name
+  no longer renames them again with a `_1` suffix, and no longer writes another
+  backup or rename-log line for them. They are reported as already named and
+  counted as skipped.
+- The fallback name for a document whose category, summary and keywords are
+  all unknown is now `<date>-document` (or the configured segment) without the
+  time of day, so a dry run, the following apply and later runs propose the
+  same name as long as the document date does not change (a document with no
+  date in its text or metadata gets today's date). Several such files from one
+  date receive the usual `_1`, `_2` suffixes on apply; a dry run still shows
+  the unsuffixed name for each of them.
+- A `--plan-file` run without `--dry-run` no longer logs "Renamed" for each
+  file, and the summary of a dry run or plan-file run says "would rename"
+  instead of "renamed". The `--summary-json` file of a plan-file run now
+  reports `"dry_run": true`, since nothing on disk changed.
+- With the `tokens` extra installed and no cached tiktoken encoding, an offline
+  or proxied machine no longer fails every PDF: the failed encoding download is
+  logged once and token counts fall back to the length estimate. The download
+  is now documented in the README and `SECURITY.md`.
 - Kept browser consent for external model endpoints process-local, bound retries
   to the exact resolved endpoint, and stopped restoring consent from shared UI
   settings.
