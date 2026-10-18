@@ -26,7 +26,7 @@ LEGACY_TUI_SETTINGS_PATH = Path.home() / ".folionym_tui.json"
 DEFAULT_UI_SETTINGS: UiSettingsSnapshot = {
     "directory": "",
     "single_file": "",
-    "language": "de",
+    "language": "en",
     "case": "kebabCase",
     "date_format": "dmy",
     "preset": "",

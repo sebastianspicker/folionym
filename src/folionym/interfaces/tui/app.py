@@ -213,7 +213,7 @@ class FolionymTUI(TuiSourceSelection, TuiValueAccess, App[None]):
         self._set_status("Preview invalidated", "status-idle")
 
     def _update_effective_configuration(self) -> None:
-        language = self.get_select("language", "de")
+        language = self.get_select("language", "en")
         case_style = self.get_select("case", "kebabCase")
         preset = self.get_select("preset", "")
         endpoint_label, disclosure = self._endpoint_disclosure()

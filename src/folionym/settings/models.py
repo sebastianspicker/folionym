@@ -8,7 +8,7 @@ from typing import Any
 
 # Public choice sets: the CLI, TUI, and browser settings derive from these.
 # Tuple order is the order the interactive forms present.
-LANGUAGE_CHOICES: tuple[str, ...] = ("de", "en")
+LANGUAGE_CHOICES: tuple[str, ...] = ("en", "de")
 DESIRED_CASE_CHOICES: tuple[str, ...] = ("kebabCase", "snakeCase", "camelCase")
 DATE_LOCALE_CHOICES: tuple[str, ...] = ("dmy", "mdy")
 WORKFLOW_PRESET_CHOICES: tuple[str, ...] = ("high-confidence-heuristic", "scanned", "fast", "accurate", "batch")
@@ -162,7 +162,7 @@ class ExtractionConfig:
 class OutputNamingConfig:
     """Hold filename-shaping options shared by all output modes."""
 
-    language: str = "de"
+    language: str = "en"
     desired_case: str = "kebabCase"
     project: str = ""
     version: str = ""

@@ -122,20 +122,19 @@ Preview a directory without sending content to an LLM:
 folionym --dir ./input_files --no-llm --dry-run
 ```
 
-The document language defaults to German (`de`). It selects German LLM
-prompts and the Tesseract `deu` language for OCR, so OCR of scans needs
-Tesseract's German language data. For English documents pass `--language en`
-(OCR then uses `eng`), or set `language: en` in a `--config` file;
+The document language defaults to English (`en`): English LLM prompts and
+the Tesseract `eng` language for OCR. German is fully supported: pass
+`--language de` (German prompts, OCR with `deu`, which needs Tesseract's German
+language data), or set `language: de` in a `--config` file.
 `FOLIONYM_OCR_LANG` overrides only the OCR language. The heuristic categories
 recognise English and German documents under either setting.
 
-When `folionym` runs in a terminal, it asks for the language, filename case,
-project and version before it starts if you did not pass `--language`,
-`--case`, `--project` or `--version` and your `--config` file does not set
-them; press Enter to accept the default shown. Without a directory or file
-option it also asks for a directory. Pass those options, or run it from a
-script or with input redirected (`< /dev/null`), to skip the questions; the
-defaults are then used, and a missing directory is an error.
+`folionym` asks no setup questions unless you pass `--interactive` (or use
+`--manual`). In a terminal, `--interactive` asks for the language, filename
+case, project and version that you did not pass as options or set in your
+`--config` file (press Enter to accept the default shown), asks for a directory
+if none was given, and then asks you to confirm each rename. Without
+`--interactive` the defaults are used, and a missing directory is an error.
 
 Preview a recursive selection:
 

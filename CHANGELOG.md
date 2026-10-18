@@ -28,6 +28,14 @@ candidate commit is tagged and published as a GitHub prerelease.
 
 ### Changed
 
+- The default document language is now English (`en`), including the OCR
+  language (`eng`). German stays fully supported with `--language de` or
+  `language: de` in a config file. The browser and terminal app also default
+  to English, list it first, and keep a language you saved earlier.
+- `folionym` no longer asks for language, case, project, version or a
+  directory just because it runs in a terminal. These questions are asked only
+  with `--interactive` (or `--manual`); otherwise the defaults are used and a
+  missing directory is an error.
 - Heuristic-only naming recognises more English and German documents under
   either `--language` setting: English lease and tenancy agreements,
   employment, loan and purchase agreements, statements of account, notices of
@@ -110,11 +118,8 @@ candidate commit is tagged and published as a GitHub prerelease.
 
 ### Fixed
 
-- The README quick start and `folionym --help` now state that the document
-  language defaults to German (`de`) and that it also selects the OCR language.
-- The README quick start and `folionym --help` now say that, in a terminal,
-  `folionym` asks for the language, case, project and version when those
-  options are omitted, and how to skip the questions.
+- The README quick start and `folionym --help` now state the default document
+  language and that it also selects the OCR language.
 - Re-running a conventional CLI apply, a TUI single-file rename, or watch mode
   (including after a restart) on files that already carry their proposed name
   no longer renames them again with a `_1` suffix, and no longer writes another

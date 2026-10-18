@@ -46,6 +46,12 @@ def _is_interactive() -> bool:
     return sys.stdin.isatty()
 
 
+def _prompts_enabled(args: argparse.Namespace) -> bool:
+    """True when interactive mode was requested (--interactive or --manual) and stdin is a TTY."""
+    requested = bool(getattr(args, "interactive", False) or getattr(args, "manual_file", None))
+    return requested and _is_interactive()
+
+
 @dataclass(frozen=True)
 class OptionPromptSpec:
     """Describe how an unset CLI option can be safely resolved."""
@@ -71,13 +77,15 @@ def _resolve_option(
     args: argparse.Namespace,
     request: OptionResolutionRequest,
 ) -> str:
-    """Resolve option: getattr(args) -> file_defaults -> interactive prompt (if TTY) -> default."""
+    """Resolve option: getattr(args) -> file_defaults -> prompt (--interactive on a TTY) -> default."""
     value = getattr(args, request.attr, None)
     if value is None:
         value = request.file_defaults.get(request.file_key)
     # Treat empty string as unset when choices are defined (avoid invalid "" for language/case)
     if value == "" and request.prompt.choices is not None:
         value = None
+    if value is None and not _prompts_enabled(args):
+        value = request.default
     if value is None:
         value = _resolve_missing_option(
             request.default,
@@ -328,7 +336,7 @@ def run_doctor_checks(args: argparse.Namespace) -> int:
 
 def _resolve_dirs(args: argparse.Namespace) -> tuple[list[str], str | None]:
     """Resolve directory list and optional single-file path from args. Raises SystemExit on error."""
-    return resolve_dirs(args, is_interactive=_is_interactive, console=_console, logger=logger)
+    return resolve_dirs(args, is_interactive=lambda: _prompts_enabled(args), console=_console, logger=logger)
 
 
 def _resolved_config_prompts(args: argparse.Namespace, file_defaults: dict[str, object]) -> dict[str, str]:
@@ -339,10 +347,10 @@ def _resolved_config_prompts(args: argparse.Namespace, file_defaults: dict[str, 
             attr="language",
             file_defaults=file_defaults,
             file_key="language",
-            default="de",
+            default="en",
             prompt=OptionPromptSpec(
-                choice_prompt="Language (de/en, default: de): ",
-                choices=["de", "en"],
+                choice_prompt="Language (en/de, default: en): ",
+                choices=["en", "de"],
                 choice_normalize=str.lower,
             ),
         ),

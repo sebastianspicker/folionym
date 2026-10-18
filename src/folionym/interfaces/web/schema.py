@@ -14,7 +14,7 @@ class UISettingsPayload(BaseModel):
 
     directory: str = ""
     single_file: str = ""
-    language: Literal["de", "en"] = "de"
+    language: Literal["de", "en"] = "en"
     case: Literal["camelCase", "kebabCase", "snakeCase"] = "kebabCase"
     date_format: Literal["dmy", "mdy"] = "dmy"
     preset: str = ""

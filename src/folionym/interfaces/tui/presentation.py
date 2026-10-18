@@ -24,7 +24,7 @@ def snapshot_from_readers(
     return {
         "directory": get_str("directory", ""),
         "single_file": get_str("single_file", ""),
-        "language": get_select("language", "de"),
+        "language": get_select("language", "en"),
         "case": get_select("case", "kebabCase"),
         "date_format": get_select("date_format", "dmy"),
         "preset": get_select("preset", ""),

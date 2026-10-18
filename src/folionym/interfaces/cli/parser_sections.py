@@ -33,7 +33,7 @@ def add_input_mode_args(p: argparse._ActionsContainer) -> None:
         nargs="*",
         default=None,
         metavar="DIR",
-        help="One or more directories containing PDFs. Interactive prompt if omitted.",
+        help="One or more directories containing PDFs. Asked with --interactive if omitted.",
     )
     p.add_argument(
         "--dirs-from-file",
@@ -121,7 +121,10 @@ def add_template_and_plan_args(p: argparse._ActionsContainer) -> None:
         "-i",
         dest="interactive",
         action="store_true",
-        help="Prompt for each file (y/n/e=edit) before renaming.",
+        help=(
+            "Ask for language, case, project and version (and a directory) when omitted, "
+            "then prompt for each file (y/n/e=edit) before renaming."
+        ),
     )
     p.add_argument(
         "--watch",
@@ -150,21 +153,24 @@ def add_language_case_project_args(p: argparse._ActionsContainer) -> None:
     p.add_argument(
         "--language",
         default=None,
-        choices=["de", "en"],
-        help="Document language for LLM prompts and OCR (deu/eng) (default: de; asked in a terminal when omitted).",
+        choices=["en", "de"],
+        help=(
+            "Document language for LLM prompts and OCR (eng/deu); German is fully supported "
+            "(default: en; asked with --interactive when omitted)."
+        ),
     )
     p.add_argument(
         "--case",
         dest="desired_case",
         default=None,
         choices=sorted(DESIRED_CASE_CHOICES),
-        help="Filename case style (default: kebabCase; asked in a terminal when omitted).",
+        help="Filename case style (default: kebabCase; asked with --interactive when omitted).",
     )
     p.add_argument(
-        "--project", default=None, help="Project prefix in generated filenames (asked in a terminal when omitted)."
+        "--project", default=None, help="Project prefix in generated filenames (asked with --interactive when omitted)."
     )
     p.add_argument(
-        "--version", default=None, help="Version suffix in generated filenames (asked in a terminal when omitted)."
+        "--version", default=None, help="Version suffix in generated filenames (asked with --interactive when omitted)."
     )
 
 

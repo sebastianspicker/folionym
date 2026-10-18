@@ -401,9 +401,9 @@ def _ocr_language_code(lang: str) -> str:
     override = (os.environ.get(ENV_OCR_LANG) or "").strip()
     if override:
         return override
-    if (lang or "").strip().lower() == "en":
-        return "eng"
-    return "deu"
+    if (lang or "").strip().lower() == "de":
+        return "deu"
+    return "eng"
 
 
 def pdf_to_text_with_ocr(  # noqa: PLR0913 - stable adapter keeps independent extraction controls
@@ -412,7 +412,7 @@ def pdf_to_text_with_ocr(  # noqa: PLR0913 - stable adapter keeps independent ex
     max_tokens: int | None = DEFAULT_MAX_CONTENT_TOKENS,
     max_pages: int = 0,
     min_chars_for_ocr: int = MIN_CHARS_BEFORE_OCR,
-    language: str = "de",
+    language: str = "en",
     read_all_pages: bool = False,
 ) -> str:
     """

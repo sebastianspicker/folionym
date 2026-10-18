@@ -51,7 +51,7 @@ def _compose_naming_options(settings: dict[str, object], presets: Sequence[tuple
     yield Static("These values shape the proposed filename; Preview never changes files.", classes="section-note")
     with Horizontal(classes="field-row"):
         yield Label("Language:", classes="field-label")
-        yield Select(LANGUAGE_OPTIONS, id="language", value=str(settings.get("language", "de")))
+        yield Select(LANGUAGE_OPTIONS, id="language", value=str(settings.get("language", "en")))
     with Horizontal(classes="field-row"):
         yield Label("Letter case:", classes="field-label")
         yield Select(CASE_OPTIONS, id="case", value=str(settings.get("case", "kebabCase")))

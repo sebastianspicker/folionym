@@ -131,9 +131,9 @@ def load_heuristic_rules_for_language(
     """
     path_obj = Path(base_path)
     base_rules = load_heuristic_rules(path_obj)
-    lang = (language or "de").strip().lower()
+    lang = (language or "en").strip().lower()
     if lang not in ("de", "en"):
-        lang = "de"
+        lang = "en"
     locale_file = path_obj.parent / f"heuristic_scores_{lang}.json"
     if not locale_file.exists():
         return base_rules
